@@ -3,9 +3,11 @@ package com.tcc.nutriapp.controller;
 
 import com.tcc.nutriapp.dto.UsuarioCadastroDto;
 import com.tcc.nutriapp.dto.UsuarioResponseDto;
+import com.tcc.nutriapp.dto.UsuarioPatchDto;
 import com.tcc.nutriapp.dto.UsuarioUpdateDto;
 import com.tcc.nutriapp.entity.Usuario;
 import com.tcc.nutriapp.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +32,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public UsuarioResponseDto postUsuario(@RequestBody UsuarioCadastroDto usuNovo){
+    public UsuarioResponseDto postUsuario(@RequestBody @Valid UsuarioCadastroDto usuNovo){
         return usuarioServ.postUsuario(usuNovo);
     }
 
@@ -40,12 +42,12 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public Usuario putUsuario(@PathVariable Long id, @RequestBody Usuario usuarioNovo){
+    public UsuarioResponseDto putUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioUpdateDto usuarioNovo){
        return usuarioServ.putUsuario(usuarioNovo, id);
     }
 
     @PatchMapping("/{id}")
-    public Usuario patchUsuario(@PathVariable Long id, @RequestBody UsuarioUpdateDto usuario){
+    public UsuarioResponseDto patchUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioPatchDto usuario){
         return usuarioServ.patchUsuario(id, usuario);
     }
 }

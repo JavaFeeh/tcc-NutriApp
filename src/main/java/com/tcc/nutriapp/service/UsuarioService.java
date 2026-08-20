@@ -2,6 +2,7 @@ package com.tcc.nutriapp.service;
 
 import com.tcc.nutriapp.dto.UsuarioCadastroDto;
 import com.tcc.nutriapp.dto.UsuarioResponseDto;
+import com.tcc.nutriapp.dto.UsuarioPatchDto;
 import com.tcc.nutriapp.dto.UsuarioUpdateDto;
 import com.tcc.nutriapp.entity.Usuario;
 import com.tcc.nutriapp.exception.ResourceNotFoundException;
@@ -57,25 +58,33 @@ public class UsuarioService {
         return usuarioResponseDto;
     }
 
-    //Atualizar(Usuario)
-    public Usuario putUsuario(Usuario usuarioNovo, Long id) {
-        Usuario usuario = usuarioRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado!"));
-
-        usuario.setNome(usuarioNovo.getNome());
-        usuario.setSenha(usuarioNovo.getSenha());
-        usuario.setEmail(usuarioNovo.getEmail());
-        usuario.setTipoUsuario(usuarioNovo.getTipoUsuario());
-
-        return usuarioRepo.save(usuario);
-    }
-
     //Deletar(Usuario)
     public void delUsuario(Long id){
-        usuarioRepo.deleteById(id);
+       usuarioRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("Usuario não encontrado!"));
+       usuarioRepo.deleteById(id);
+    }
+
+    //Atualizar(Usuario)
+    public UsuarioResponseDto putUsuario(UsuarioUpdateDto usuarioNovo, Long id) {
+        Usuario usuario = usuarioRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Usuario não encontrado!"));
+
+        usuario.setNome(usuarioNovo.nome());
+        usuario.setSenha(usuarioNovo.senha());
+        usuario.setEmail(usuarioNovo.email());
+        usuario.setTipoUsuario(usuarioNovo.tipoUsuario());
+
+        Usuario usuarioSave = usuarioRepo.save(usuario);
+
+        UsuarioResponseDto usuarioAtualizado = new UsuarioResponseDto(usuarioSave.getId(), usuarioSave.getNome(),
+                usuarioSave.getEmail(), usuarioSave.getTipoUsuario());
+
+
+        return usuarioAtualizado;
     }
 
     //Atualizar parcialmente(Usuario)
-    public Usuario patchUsuario(Long id, UsuarioUpdateDto usuarioNovo) {
+    public UsuarioResponseDto patchUsuario(Long id, UsuarioPatchDto usuarioNovo) {
         Usuario usuario = usuarioRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado!"));
 
         if(usuarioNovo.email() != null){
@@ -90,7 +99,11 @@ public class UsuarioService {
             usuario.setSenha(usuarioNovo.senha());
         }
 
-        return usuarioRepo.save(usuario);
+        Usuario usuarioSave = usuarioRepo.save(usuario);
+
+        UsuarioResponseDto usuarioResponseDto = new UsuarioResponseDto(usuarioSave.getId(), usuarioSave.getNome(), usuarioSave.getEmail(), usuarioSave.getTipoUsuario());
+
+        return usuarioResponseDto;
     }
 
 
