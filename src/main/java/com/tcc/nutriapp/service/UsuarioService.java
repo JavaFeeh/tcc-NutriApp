@@ -1,35 +1,65 @@
 package com.tcc.nutriapp.service;
 
-import com.tcc.nutriapp.dto.UsuarioDto;
+import com.tcc.nutriapp.dto.UsuarioCadastroDto;
+import com.tcc.nutriapp.dto.UsuarioResponseDto;
+import com.tcc.nutriapp.dto.UsuarioUpdateDto;
 import com.tcc.nutriapp.entity.Usuario;
 import com.tcc.nutriapp.exception.ResourceNotFoundException;
 import com.tcc.nutriapp.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UsuarioService {
 
-    @Autowired UsuarioRepository usuarioRepo;
+    private UsuarioRepository usuarioRepo;
 
-    public Usuario postUsuario(Usuario usuario){
-        return usuarioRepo.save(usuario);
+    public UsuarioService(UsuarioRepository usuarioRepo){
+       this.usuarioRepo = usuarioRepo;
     }
 
-    public List<Usuario> listarUsuarios(){
-        return usuarioRepo.findAll();
+    //Procurar(Usuario)
+    public UsuarioResponseDto getUsuario(Long id){
+        Usuario usuario = usuarioRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Usuario não encontrado!"));
+
+        UsuarioResponseDto usuarioResponseDto = new UsuarioResponseDto(usuario.getId(), usuario.getNome(),
+                usuario.getEmail(), usuario.getTipoUsuario());
+
+        return usuarioResponseDto;
     }
 
-    public Usuario getUusario(Long id){
-        return usuarioRepo.findById(id).orElseThrow( () -> new ResourceNotFoundException("Usuario não encontrado!"));
+    //Listar(Usuarios)
+    public List<UsuarioResponseDto> listarUsuarios(){
+        List<Usuario> usuarios = usuarioRepo.findAll();
+        List<UsuarioResponseDto> usuarioResponseDtos= new ArrayList<UsuarioResponseDto>();
+
+        for(Usuario usu: usuarios){
+
+            UsuarioResponseDto usuarioResponseDto = new UsuarioResponseDto(usu.getId(), usu.getNome(),
+                    usu.getEmail(), usu.getTipoUsuario());
+            usuarioResponseDtos.add(usuarioResponseDto);
+
+        }
+
+        return usuarioResponseDtos;
 
     }
 
-    public Usuario putUsuario(Usuario usuarioNovo, Long id){
-        Usuario usuario = usuarioRepo.findById(id).orElseThrow( () -> ResourceNotFoundException("Usuario não encontrado!"));
+    //Adicionar(Usuario)
+    public UsuarioResponseDto postUsuario( UsuarioCadastroDto usuario){
+        Usuario usuNovo = new Usuario(usuario.nome(), usuario.email(), usuario.senha(), usuario.tipoUsuario());
+        usuNovo = usuarioRepo.save(usuNovo);
+        UsuarioResponseDto usuarioResponseDto = new UsuarioResponseDto(usuNovo.getId(), usuNovo.getNome(),
+                usuNovo.getEmail(), usuNovo.getTipoUsuario());
+        return usuarioResponseDto;
+    }
+
+    //Atualizar(Usuario)
+    public Usuario putUsuario(Usuario usuarioNovo, Long id) {
+        Usuario usuario = usuarioRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado!"));
 
         usuario.setNome(usuarioNovo.getNome());
         usuario.setSenha(usuarioNovo.getSenha());
@@ -37,9 +67,35 @@ public class UsuarioService {
         usuario.setTipoUsuario(usuarioNovo.getTipoUsuario());
 
         return usuarioRepo.save(usuario);
+    }
 
-    public Usuario patchUsuario(UsuarioDto usuarioNovo)
+    //Deletar(Usuario)
+    public void delUsuario(Long id){
+        usuarioRepo.deleteById(id);
+    }
+
+    //Atualizar parcialmente(Usuario)
+    public Usuario patchUsuario(Long id, UsuarioUpdateDto usuarioNovo) {
+        Usuario usuario = usuarioRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario não encontrado!"));
+
+        if(usuarioNovo.email() != null){
+            usuario.setEmail(usuarioNovo.email());
+        }
+
+        if(usuarioNovo.nome() != null){
+            usuario.setNome(usuarioNovo.nome());
+        }
+
+        if(usuarioNovo.senha() != null){
+            usuario.setSenha(usuarioNovo.senha());
+        }
+
+        return usuarioRepo.save(usuario);
     }
 
 
+
 }
+
+
+

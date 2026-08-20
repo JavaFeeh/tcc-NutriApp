@@ -1,7 +1,6 @@
 package com.tcc.nutriapp.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,10 +9,16 @@ import lombok.Setter;
 @Entity
 @Table(name = "usuarios")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class Usuario {
+
+    public Usuario(String nome, String email, String senha, TipoUsuario tipoUsuario){
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.tipoUsuario = tipoUsuario;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

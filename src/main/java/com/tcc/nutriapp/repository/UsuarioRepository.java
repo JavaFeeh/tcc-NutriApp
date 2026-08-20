@@ -3,7 +3,6 @@ package com.tcc.nutriapp.repository;
 import com.tcc.nutriapp.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Arrays;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
